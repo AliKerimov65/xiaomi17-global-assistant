@@ -19,6 +19,11 @@
   ],
   "shortcuts": [
     {
+      "name": "Магазины приложений",
+      "url": "./index.html#tab-stores",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
       "name": "Сценарий A · Сток без разблокировки",
       "url": "./index.html#tab-stock",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]

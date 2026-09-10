@@ -40,6 +40,14 @@
       intro: 'Root на Android 16 через <strong>KernelSU-Next</strong> и GKI-ядро, плюс стек модулей для прохождения Play Integrity — после этого работают банковские приложения и Google Wallet. Помните: GKI-ядро прошивается в <code>boot</code>, LKM-патч — в <code>init_boot</code>.'
     },
     {
+      id: 'stores',
+      tab: 'Магазины',
+      anchor: 'tab-stores',
+      verdict: 'safe',
+      verdictText: 'Мультиязычные магазины приложений',
+      intro: 'Китайский GetApps — не единственный вариант. Эти магазины полностью <strong>мультиязычны (включая русский)</strong> и работают на HyperOS как на CN-прошивке, так и на xiaomi.eu: каталог Google Play без аккаунта, FOSS-репозитории, прямые обновления с GitHub и русскоязычная витрина. Все ставятся обычным APK.'
+    },
+    {
       id: 'ref',
       tab: 'Справка',
       anchor: 'tab-ref',
@@ -318,6 +326,99 @@
       ],
       links: [
         { label: 'MiCTS · GitHub', url: 'https://github.com/parallelcc/MiCTS', primary: true }
+      ]
+    },
+
+    /* ---------- МАГАЗИНЫ ---------- */
+    {
+      id: 'store-aurora', sec: 'stores', level: 'safe', levelText: 'ru · en',
+      name: 'Aurora Store', src: 'Aurora OSS · GitHub',
+      tagline: 'Каталог Google Play анонимно, без Google-аккаунта',
+      desc: 'Открытый (GPLv3) клиент Play Store со <strong>всем каталогом Google</strong>: скачивание и обновление бесплатных приложений через анонимные сессии — свой аккаунт не нужен, работает и без Google Play Services. Есть спуф устройства и региона для доступа к геозаблокированным приложениям, интеграция Exodus Privacy (видны трекеры в APK). Интерфейс переведён, в т.ч. на русский. Ограничения: платные приложения не скачиваются анонимно, анонимные сессии иногда ограничиваются Google — лечится ротацией или входом со своим аккаунтом.',
+      steps: [
+        'Установите APK из GitHub Releases (или через F-Droid).',
+        'На старте выберите <strong>анонимный вход</strong> — аккаунт Google не требуется.',
+        'Настройки → язык интерфейса; при геоблоках — спуф региона/устройства.',
+        'Платные купленные приложения: войдите своим Google-аккаунтом (опционально).'
+      ],
+      links: [
+        { label: 'Скачать APK · GitHub', url: 'https://github.com/whyorean/AuroraStore/releases', primary: true },
+        { label: 'auroraoss.com', url: 'https://auroraoss.com/' }
+      ]
+    },
+    {
+      id: 'store-obtainium', sec: 'stores', level: 'safe', levelText: 'ru · en',
+      name: 'Obtainium', src: 'ImranR98 · GitHub',
+      tagline: 'Обновления приложений напрямую с источника — GitHub, F-Droid, RuStore',
+      desc: '«Магазин без магазина»: ставит и <strong>обновляет приложения прямо со страниц релизов</strong> — GitHub, GitLab, F-Droid, APKPure, Aptoide, Uptodown, RuStore, Huawei AppGallery и десятки других источников, включая прямые APK-ссылки. Идеально для инструментов этого гайда: Shizuku, Canta, MiCTS и KernelSU-Next обновляются сами, без ручной проверки GitHub. Интерфейс мультиязычный, русская локализация активно поддерживается сообществом. При десятках GitHub-приложений добавьте Personal Access Token, чтобы не упираться в rate limit API.',
+      steps: [
+        'Установите APK из GitHub Releases, при желании сверьте SHA-256 сертификата (на странице проекта).',
+        '«Добавить приложение» → вставьте ссылку на репозиторий/страницу — источник определится сам.',
+        'Готовые конфигурации: каталог apps.obtainium.imranr.dev — импорт в один тап.',
+        'Включите фоновую проверку обновлений — уведомления о новых релизах придут сами.'
+      ],
+      links: [
+        { label: 'Скачать APK · GitHub', url: 'https://github.com/ImranR98/Obtainium/releases', primary: true },
+        { label: 'Каталог конфигураций', url: 'https://apps.obtainium.imranr.dev/' }
+      ]
+    },
+    {
+      id: 'store-fdroid', sec: 'stores', level: 'safe', levelText: '30+ языков',
+      name: 'F-Droid', src: 'F-Droid Ltd / Commons Conservancy',
+      tagline: 'Эталонный репозиторий свободных приложений без аккаунта',
+      desc: 'Классический FOSS-магазин: тысячи приложений с открытым кодом, <strong>без регистрации, трекинга и рекламы</strong>; «анти-функции» (реклама, трекеры) честно помечаются в описании. Сайт и клиент переведены более чем на 30 языков, включая русский. Клиент умеет прокси и Tor, офлайн-раздачу приложений по Wi-Fi/Bluetooth. Внимание к подписям: приложение из F-Droid подписано ключом F-Droid — поверх него не встанет сборка с GitHub, и наоборот.',
+      steps: [
+        'Скачайте APK только с официального f-droid.org, установите.',
+        'При первом запуске дождитесь загрузки репозитория (2–10 минут).',
+        'Разрешите F-Droid установку из неизвестных источников; браузеру после этого можно запретить.',
+        'Обновления приходят через сам клиент — автообновление по умолчанию выключено.'
+      ],
+      links: [
+        { label: 'Скачать APK · f-droid.org', url: 'https://f-droid.org/F-Droid.apk', primary: true },
+        { label: 'Каталог · f-droid.org', url: 'https://f-droid.org/en/packages/' }
+      ]
+    },
+    {
+      id: 'store-droidify', sec: 'stores', level: 'safe', levelText: 'ru · en',
+      name: 'Droid-ify', src: 'Droid-ify · GitHub',
+      tagline: 'Быстрый Material 3 клиент для F-Droid',
+      desc: 'Неофициальный клиент к репозиторию F-Droid: тот же каталог FOSS-приложений, но <strong>заметно быстрее и современнее</strong> официального — Material 3, Material You-темы, фоновая синхронизация, добавление сторонних репозиториев по QR-коду. Русская локализация на месте. Хорошая замена стоковому клиенту, если F-Droid кажется медленным.',
+      steps: [
+        'Установите APK из GitHub Releases (или с f-droid.org).',
+        'Репозиторий F-Droid подключён по умолчанию; сторонние репы — Настройки → Репозитории.',
+        'Включите автообновление в настройках, если хотите «поставил и забыл».'
+      ],
+      links: [
+        { label: 'Скачать APK · GitHub', url: 'https://github.com/Droid-ify/client/releases', primary: true },
+        { label: 'Страница на F-Droid', url: 'https://f-droid.org/en/packages/com.looker.droidify/' }
+      ]
+    },
+    {
+      id: 'store-apkmirror', sec: 'stores', level: 'safe', levelText: 'en · web',
+      name: 'APKMirror', src: 'Illogical Robot · веб',
+      tagline: 'Проверенные APK с историей версий и контролем подписей',
+      desc: 'Не магазин, а эталонный <strong>архив APK</strong>: все файлы проходят криптографическую проверку подписей, для каждого приложения доступна история версий, варианты архитектур (arm64 и т.д.) и требования к Android. Незаменим, когда нужна конкретная старая версия или приложение, которого нет в вашем регионе. Интерфейс английский, но навигация элементарная. Для bundles (APKM) используйте их установщик APKMirror Installer.',
+      steps: [
+        'Найдите приложение → выберите версию → вариант <strong>arm64-v8a</strong>, APK (не bundle, если сомневаетесь).',
+        'Скачанное ставится штатным установщиком HyperOS.',
+        'Для .apkm-файлов: установите APKMirror Installer из Play Store или с самого APKMirror.'
+      ],
+      links: [
+        { label: 'apkmirror.com', url: 'https://www.apkmirror.com/', primary: true }
+      ]
+    },
+    {
+      id: 'store-rustore', sec: 'stores', level: 'safe', levelText: 'ru',
+      name: 'RuStore', src: 'VK · официальный магазин РФ',
+      tagline: 'Русскоязычная витрина: банки, госуслуги, локальные сервисы',
+      desc: 'Официальный российский магазин приложений: полностью <strong>русскоязычный интерфейс</strong>, обязательная модерация приложений, вся локальная экосистема — банки, маркетплейсы, госсервисы, игры. На китайском Xiaomi ставится обычным APK и работает без дополнительных настроек. Дополняет Aurora/F-Droid там, где нужны именно российские сервисы; заграничный Play Store их часто не показывает.',
+      steps: [
+        'Скачайте APK с официального rustore.ru и установите.',
+        'Войдите с VK ID или номером телефона — нужен для покупок и части функций.',
+        'Проверьте настройки энергосбережения: RuStore → автозапуск вкл, батарея «нет ограничений», чтобы обновления приходили вовремя.'
+      ],
+      links: [
+        { label: 'Скачать APK · rustore.ru', url: 'https://www.rustore.ru/', primary: true }
       ]
     },
 
