@@ -568,3 +568,173 @@ body {
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
   html { scroll-behavior: auto; }
 }
+
+/* ---------- Auto-store (прямая загрузка APK) ---------- */
+.auto-store {
+  border: 1px solid rgba(210, 253, 120, 0.28);
+  border-radius: var(--radius);
+  background: rgba(210, 253, 120, 0.03);
+  padding: 14px;
+  margin-bottom: 22px;
+}
+.auto-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.auto-title {
+  font-weight: 700;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+  color: var(--acid);
+}
+.auto-refresh {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-70);
+  background: hsla(0,0%,100%,.05);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 11px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  white-space: nowrap;
+}
+.auto-refresh:active { transform: scale(0.94); }
+.auto-sub {
+  font-size: 12.5px;
+  color: var(--ink-50);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+.auto-search {
+  width: 100%;
+  background: #0f1310;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border-color 150ms ease;
+  -webkit-appearance: none;
+}
+.auto-search:focus { border-color: rgba(210, 253, 120, 0.5); }
+.auto-search::placeholder { color: var(--ink-30); }
+
+.auto-grid { display: flex; flex-direction: column; gap: 8px; }
+
+.a-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  background: var(--bg-raise);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.a-ico {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  background: hsla(0,0%,100%,.06);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--acid);
+  overflow: hidden;
+  flex: none;
+}
+.a-ico.has-img { background: #ffffff; border-color: transparent; }
+.a-ico img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.a-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: -0.005em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.a-cat {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-weight: 400;
+}
+.a-tag {
+  font-size: 11.5px;
+  color: var(--ink-50);
+  line-height: 1.4;
+  margin-top: 1px;
+}
+.a-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-30);
+  letter-spacing: 0.03em;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.a-meta.ok { color: var(--ok); }
+.a-meta.fail { color: var(--warn); }
+.a-btns { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.a-dl {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--acid-ink);
+  background: var(--acid);
+  border-radius: 999px;
+  padding: 8px 15px;
+  transition: all 150ms ease;
+  white-space: nowrap;
+}
+.a-dl:active { transform: scale(0.94); }
+.a-dl.is-disabled {
+  background: hsla(0,0%,100%,.07);
+  color: var(--ink-30);
+  pointer-events: none;
+}
+.a-dl.a-dl-web { background: transparent; border: 1px solid rgba(210,253,120,.45); color: var(--acid); }
+.a-page {
+  width: 26px; height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-30);
+  transition: color 150ms ease;
+}
+.a-page:hover { color: var(--ink-70); }
+.a-page svg { width: 14px; height: 14px; }
+.auto-note {
+  font-size: 11px;
+  color: var(--ink-30);
+  line-height: 1.5;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.classic-title {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-50);
+  margin: 6px 0 12px;
+}

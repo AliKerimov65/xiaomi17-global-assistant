@@ -45,7 +45,7 @@
       anchor: 'tab-stores',
       verdict: 'safe',
       verdictText: 'Мультиязычные магазины приложений',
-      intro: 'Китайский GetApps — не единственный вариант. Эти магазины полностью <strong>мультиязычны (включая русский)</strong> и работают на HyperOS как на CN-прошивке, так и на xiaomi.eu: каталог Google Play без аккаунта, FOSS-репозитории, прямые обновления с GitHub и русскоязычная витрина. Все ставятся обычным APK.'
+      intro: '<strong>Авто-режим:</strong> каталог ниже скачивает APK напрямую из приложения — версии и ссылки подтягиваются автоматически с GitHub и F-Droid, устанавливать сами магазины не нужно. Ниже — классические магазины (Aurora, Obtainium, RuStore и др.) для тех, кто хочет полноценную витрину: все они <strong>мультиязычны</strong> и работают на HyperOS как на CN-прошивке, так и на xiaomi.eu.'
     },
     {
       id: 'ref',
@@ -461,6 +461,265 @@
   ];
 
   /* ================================================================
+     АВТО-РЕЖИМ: встроенный каталог с прямой загрузкой APK
+     github: "owner/repo" → api.github.com (последний релиз, .apk-ассет)
+     fdroid: "package.id" → f-droid.org API v1 (suggestedVersion → APK)
+     direct: статичная прямая ссылка · web: только страница
+     ================================================================ */
+  const AUTO_APPS = [
+    /* — Инструменты устройства — */
+    { aid: 'shizuku', cat: 'tools', name: 'Shizuku', tag: 'Права shell без root — основа деблоата',
+      alias: 'shizuku шизуку adb права', github: 'RikkaApps/Shizuku', fdroid: 'moe.shizuku.privileged.api',
+      web: 'https://shizuku.rikka.app/' },
+    { aid: 'canta', cat: 'tools', name: 'Canta', tag: 'Удаление китайского bloatware (UAD-список)',
+      alias: 'canta канта деблоат удаление bloatware', github: 'samolego/Canta', fdroid: 'org.samo_lego.canta',
+      web: 'https://github.com/samolego/Canta' },
+    { aid: 'micts', cat: 'tools', name: 'MiCTS', tag: 'Circle to Search на CN-прошивке',
+      alias: 'micts circle to search поиск кругом', github: 'parallelcc/MiCTS',
+      web: 'https://github.com/parallelcc/MiCTS' },
+    { aid: 'kernelsu', cat: 'tools', name: 'KernelSU-Next', tag: 'Менеджер root и модулей (Android 16)',
+      alias: 'kernelsu рут root модули', github: 'KernelSU-Next/KernelSU-Next',
+      web: 'https://github.com/KernelSU-Next/KernelSU-Next' },
+    { aid: 'hyperceiler', cat: 'tools', name: 'HyperCeiler', tag: 'Тонкая настройка HyperOS (LSPosed)',
+      alias: 'hyperceiler настройка hyperos модуль', github: 'ReChronoRain/HyperCeiler',
+      web: 'https://github.com/ReChronoRain/HyperCeiler' },
+    { aid: 'termux', cat: 'tools', name: 'Termux', tag: 'Терминал: ADB-команды прямо с телефона',
+      alias: 'termux терминал adb команды консоль', github: 'termux/termux-app', fdroid: 'com.termux',
+      web: 'https://termux.dev/' },
+    { aid: 'setedit', cat: 'tools', name: 'SetEdit', tag: 'Локали приложений (system_locale → ru-RU)',
+      alias: 'setedit локаль язык русский locale', web: 'https://play.google.com/store/apps/details?id=by4a.setedit22' },
+    /* — Магазины (сами ставятся прямо отсюда) — */
+    { aid: 'aurora', cat: 'stores', name: 'Aurora Store', tag: 'Каталог Google Play анонимно, без аккаунта',
+      alias: 'aurora аврора google play плей маркет', github: 'whyorean/AuroraStore', fdroid: 'com.aurora.store',
+      web: 'https://auroraoss.com/' },
+    { aid: 'obtainium', cat: 'stores', name: 'Obtainium', tag: 'Автообновления приложений с источника',
+      alias: 'obtainium обновления github релизы', github: 'ImranR98/Obtainium',
+      web: 'https://github.com/ImranR98/Obtainium' },
+    { aid: 'droidify', cat: 'stores', name: 'Droid-ify', tag: 'Быстрый Material 3 клиент F-Droid',
+      alias: 'droidify дроидифай fdroid фдроид', github: 'Droid-ify/client', fdroid: 'com.looker.droidify',
+      web: 'https://github.com/Droid-ify/client' },
+    { aid: 'fdroid', cat: 'stores', name: 'F-Droid', tag: 'Эталонный FOSS-репозиторий без аккаунта',
+      alias: 'fdroid фдроид foss свободные', direct: 'https://f-droid.org/F-Droid.apk',
+      web: 'https://f-droid.org/' },
+    { aid: 'rustore', cat: 'stores', name: 'RuStore', tag: 'Русскоязычная витрина: банки, сервисы РФ',
+      alias: 'rustore рустор банки россия', web: 'https://www.rustore.ru/' },
+    /* — Повседневные — */
+    { aid: 'aegis', cat: 'daily', name: 'Aegis Authenticator', tag: '2FA-коды с экспортом — перед сбросом!',
+      alias: 'aegis 2fa двухфакторка коды', github: 'beemdevelopment/Aegis', fdroid: 'com.beemdevelopment.aegis',
+      web: 'https://getaegis.app/' },
+    { aid: 'keepassdx', cat: 'daily', name: 'KeePassDX', tag: 'Пароли локально, мультиязычный',
+      alias: 'keepass пароли менеджер', github: 'Kunzisoft/KeePassDX', fdroid: 'com.kunzisoft.keepass.free',
+      web: 'https://www.keepassdx.com/' },
+    { aid: 'localsend', cat: 'daily', name: 'LocalSend', tag: 'Передача файлов на ПК без кабеля',
+      alias: 'localsend файлы передача wifi airdrop', github: 'localsend/localsend', fdroid: 'org.localsend.localsend_app',
+      web: 'https://localsend.org/' },
+    { aid: 'newpipe', cat: 'daily', name: 'NewPipe', tag: 'YouTube без рекламы и аккаунта',
+      alias: 'newpipe ютуб видео без рекламы', github: 'TeamNewPipe/NewPipe', fdroid: 'org.schabi.newpipe',
+      web: 'https://newpipe.net/' },
+    { aid: 'matfiles', cat: 'daily', name: 'Material Files', tag: 'Файловый менеджер вместо CN-проводника',
+      alias: 'material files файлы менеджер проводник', fdroid: 'me.zhanghai.android.files',
+      web: 'https://github.com/zhanghai/MaterialFiles' },
+    { aid: 'fossify-gallery', cat: 'daily', name: 'Fossify Gallery', tag: 'Галерея вместо китайской «Галереи Mi»',
+      alias: 'fossify gallery галерея фото замена', github: 'FossifyOrg/Gallery', fdroid: 'org.fossify.gallery',
+      web: 'https://github.com/FossifyOrg/Gallery' },
+    { aid: 'wireguard', cat: 'daily', name: 'WireGuard', tag: 'VPN-туннель, официальный клиент',
+      alias: 'wireguard vpn впрн туннель', fdroid: 'com.wireguard.android',
+      web: 'https://www.wireguard.com/' }
+  ];
+
+  const AUTO_CATS = { tools: 'инструмент', stores: 'магазин', daily: 'ежедневное' };
+  const STORE_CACHE_KEY = 'ga-store-v1';
+  const STORE_TTL = 6 * 3600 * 1000;
+
+  function storeCacheRead() {
+    try { return JSON.parse(localStorage.getItem(STORE_CACHE_KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function storeCacheWrite(aid, entry) {
+    const c = storeCacheRead();
+    c[aid] = Object.assign({}, entry, { ts: Date.now() });
+    try { localStorage.setItem(STORE_CACHE_KEY, JSON.stringify(c)); } catch (e) {}
+  }
+
+  function pickApkAsset(assets) {
+    const apks = (assets || []).filter((a) => /\.apk$/i.test(a.name));
+    if (!apks.length) return null;
+    const score = (a) => {
+      const n = a.name.toLowerCase();
+      let s = 0;
+      if (n.indexOf('universal') !== -1) s += 4;
+      if (n.indexOf('arm64') !== -1) s += 3;
+      if (n.indexOf('release') !== -1) s += 2;
+      if (n.indexOf('x86') !== -1) s -= 5;
+      if (n.indexOf('source') !== -1) s -= 5;
+      return s;
+    };
+    return apks.slice().sort((a, b) => score(b) - score(a))[0];
+  }
+
+  function fetchJSON(url) {
+    const opts = { headers: { 'Accept': 'application/json' } };
+    if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+      opts.signal = AbortSignal.timeout(8000);
+    }
+    return fetch(url, opts)
+      .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+
+  /* Резолвер: возвращает {v, url, size, src, icon} или null */
+  function resolveApp(app) {
+    const cached = storeCacheRead()[app.aid];
+    const fresh = cached && (Date.now() - cached.ts < STORE_TTL);
+    if (fresh) return Promise.resolve(Object.assign({ cached: true }, cached));
+
+    let attempt;
+    if (app.github) {
+      attempt = fetchJSON('https://api.github.com/repos/' + app.github + '/releases/latest')
+        .then((rel) => {
+          const asset = pickApkAsset(rel.assets);
+          if (!asset) throw new Error('no apk');
+          return { v: (rel.tag_name || rel.name || '').replace(/^v/i, ''), url: asset.browser_download_url,
+                   size: asset.size, src: 'GitHub' };
+        })
+        .catch((e) => {
+          if (app.fdroid) return resolveFdroid(app.fdroid);
+          throw e;
+        });
+    } else if (app.fdroid) {
+      attempt = resolveFdroid(app.fdroid);
+    } else if (app.direct) {
+      attempt = Promise.resolve({ v: '', url: app.direct, size: 0, src: 'прямая ссылка · официальный источник' });
+    } else {
+      attempt = Promise.reject(new Error('web only'));
+    }
+
+    return attempt
+      .then((res) => { storeCacheWrite(app.aid, res); return res; })
+      .catch((e) => {
+        if (cached) return Object.assign({ cached: true, stale: true }, cached);
+        return null;
+      });
+  }
+
+  function resolveFdroid(pkg) {
+    return fetchJSON('https://f-droid.org/api/v1/packages/' + pkg)
+      .then((d) => {
+        const code = String(d.suggestedVersionCode || '');
+        if (!code) throw new Error('no version');
+        let name = d.suggestedVersionName || '';
+        if (!name && d.packages && d.packages[code]) name = d.packages[code].versionName || '';
+        return { v: name, url: 'https://f-droid.org/repo/' + pkg + '_' + code + '.apk',
+                 size: 0, src: 'F-Droid', icon: 'https://f-droid.org/repo/icons-640/' + pkg + '.' + code + '.png' };
+      });
+  }
+
+  function autoCardHTML(app) {
+    const letter = app.name.trim().charAt(0).toUpperCase();
+    const pageUrl = app.web || (app.github ? 'https://github.com/' + app.github : 'https://f-droid.org/en/packages/' + app.fdroid + '/');
+    return '' +
+      '<div class="a-card" data-aid="' + app.aid + '" data-search="' + esc((app.name + ' ' + app.tag + ' ' + app.alias).toLowerCase()) + '">' +
+        '<div class="a-ico" data-ico>' + esc(letter) + '</div>' +
+        '<div class="a-main">' +
+          '<div class="a-name">' + esc(app.name) + '<span class="a-cat">' + AUTO_CATS[app.cat] + '</span></div>' +
+          '<div class="a-tag">' + esc(app.tag) + '</div>' +
+          '<div class="a-meta" data-meta>версия: проверка…</div>' +
+        '</div>' +
+        '<div class="a-btns">' +
+          '<a class="a-dl is-disabled" data-dl href="#" rel="noopener">APK</a>' +
+          '<a class="a-page" href="' + pageUrl + '" target="_blank" rel="noopener noreferrer" aria-label="Страница проекта">' + EXT_SVG + '</a>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function paintResolved(card, app, res) {
+    const meta = card.querySelector('[data-meta]');
+    const dl = card.querySelector('[data-dl]');
+    const ico = card.querySelector('[data-ico]');
+    if (res && res.url) {
+      let txt = res.src + (res.v ? ' · v' + res.v : '');
+      if (res.size) txt += ' · ' + (res.size / 1048576).toFixed(1) + ' МБ';
+      if (res.stale || (res.cached && !navigator.onLine)) txt += ' · кэш';
+      meta.textContent = txt;
+      meta.classList.add('ok');
+      dl.href = res.url;
+      dl.classList.remove('is-disabled');
+      dl.setAttribute('target', '_blank');
+      if (res.icon) {
+        const img = document.createElement('img');
+        img.src = res.icon; img.alt = '';
+        img.onload = () => { ico.innerHTML = ''; ico.appendChild(img); ico.classList.add('has-img'); };
+      }
+    } else {
+      meta.textContent = app.web ? 'прямая ссылка недоступна — откройте страницу' : 'источник недоступен';
+      meta.classList.add('fail');
+      if (app.web) {
+        dl.textContent = 'Сайт';
+        dl.href = app.web;
+        dl.classList.remove('is-disabled');
+        dl.setAttribute('target', '_blank');
+        dl.classList.add('a-dl-web');
+      }
+    }
+  }
+
+  function initAutoStore() {
+    const grid = $('#autoGrid');
+    if (!grid) return;
+    grid.innerHTML = AUTO_APPS.map(autoCardHTML).join('');
+    const resolved = {};
+    const io = ('IntersectionObserver' in window)
+      ? new IntersectionObserver((entries) => {
+          entries.forEach((en) => {
+            if (!en.isIntersecting) return;
+            const card = en.target;
+            const aid = card.dataset.aid;
+            io.unobserve(card);
+            if (resolved[aid]) return;
+            resolved[aid] = true;
+            const app = AUTO_APPS.find((a) => a.aid === aid);
+            resolveApp(app).then((res) => paintResolved(card, app, res));
+          });
+        }, { rootMargin: '200px' })
+      : null;
+    grid.querySelectorAll('.a-card').forEach((card) => {
+      if (io) io.observe(card);
+      else {
+        const aid = card.dataset.aid;
+        resolved[aid] = true;
+        const app = AUTO_APPS.find((a) => a.aid === aid);
+        resolveApp(app).then((res) => paintResolved(card, app, res));
+      }
+    });
+    /* поиск */
+    const search = $('#autoSearch');
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        grid.querySelectorAll('.a-card').forEach((card) => {
+          card.style.display = (!q || card.dataset.search.indexOf(q) !== -1) ? '' : 'none';
+        });
+      });
+    }
+    /* принудительное обновление версий */
+    const refresh = $('#autoRefresh');
+    if (refresh) {
+      refresh.addEventListener('click', () => {
+        try { localStorage.removeItem(STORE_CACHE_KEY); } catch (e) {}
+        grid.querySelectorAll('.a-card').forEach((card) => {
+          const aid = card.dataset.aid;
+          const app = AUTO_APPS.find((a) => a.aid === aid);
+          const meta = card.querySelector('[data-meta]');
+          meta.textContent = 'версия: проверка…';
+          meta.classList.remove('ok', 'fail');
+          resolved[aid] = true;
+          resolveApp(app).then((res) => paintResolved(card, app, res));
+        });
+        toast('Версии обновляются…');
+      });
+    }
+  }
+
+  /* ================================================================
      СОСТОЯНИЕ
      ================================================================ */
   const LS_KEY = 'ga-pwa-state-v1';
@@ -529,12 +788,27 @@
       const pane = document.createElement('section');
       pane.className = 'pane' + (i === 0 ? ' active' : '');
       pane.dataset.sec = sec.id;
+      const autoBlock = sec.id === 'stores'
+        ? '<div class="auto-store">' +
+            '<div class="auto-head">' +
+              '<div class="auto-title">Авто-режим · прямая загрузка APK</div>' +
+              '<button class="auto-refresh" id="autoRefresh" type="button">Обновить версии</button>' +
+            '</div>' +
+            '<div class="auto-sub">Содержимое магазинов — прямо здесь: версии и ссылки на APK подтягиваются автоматически с GitHub и F-Droid. Нажмите «APK» — файл скачается и установится штатным установщиком HyperOS. Сами магазины ставить не обязательно.</div>' +
+            '<input class="auto-search" id="autoSearch" type="search" placeholder="Поиск: shizuku, галерея, пароли…" autocomplete="off">' +
+            '<div class="auto-grid" id="autoGrid"></div>' +
+            '<div class="auto-note">Google Play и RuStore не отдают APK напрямую из браузера — для них кнопка «Сайт» открывает официальную страницу.</div>' +
+          '</div>' +
+          '<div class="classic-title">Классические магазины — по желанию</div>'
+        : '';
       pane.innerHTML =
         '<div class="pane-intro"><span class="verdict ' + sec.verdict + '">' + esc(sec.verdictText) + '</span><br>' + sec.intro + '</div>' +
+        autoBlock +
         items.map(itemHTML).join('');
       contentEl.appendChild(pane);
     });
     updateOverall();
+    initAutoStore();
   }
 
   function switchTab(secId) {
