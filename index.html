@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Global Assistant · Xiaomi 17 Pro Max (popsicle)</title>
+<meta name="description" content="Установочный центр для «глобализации» китайского Xiaomi 17 Pro Max: GMS, Gemini, Circle to Search, деблоат, xiaomi.eu, root-стек. Офлайн-чеклист.">
+<meta name="theme-color" content="#151a17">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Global Assistant">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img class="logo" src="icons/icon-192.png" alt="" width="26" height="26">
+    <div>
+      <span class="brand-text">Global Assistant</span>
+      <span class="brand-sub">popsicle · 2509FPN0BC</span>
+    </div>
+  </div>
+  <div></div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="pwa-status" id="netStatus"><span class="dot off" id="netDot"></span><span id="netText">офлайн</span></span>
+    <button class="install-btn" id="installBtn" type="button">Установить</button>
+    <span class="install-hint" id="installHint">Меню браузера → «Добавить на экран "Домой"»</span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="kicker">Xiaomi 17 Pro Max · CN → Global</div>
+  <h1>Установочный центр приложений для вашего <em>«глобального»</em> 17&nbsp;Pro&nbsp;Max</h1>
+  <p>Глобальной версии этой модели не существует — её делаете вы. Здесь собраны все проверенные приложения и шаги: <strong>GMS, Gemini вместо XiaoAI, Circle to Search, деблоат, xiaomi.eu и root-стек</strong>. Отмечайте выполненное — прогресс сохраняется на устройстве, приложение работает офлайн.</p>
+</section>
+
+<div class="overall">
+  <div class="overall-label"><span>Общий прогресс</span><span id="overallPct">0 / 0</span></div>
+  <div class="track"><div class="fill" id="overallFill"></div></div>
+</div>
+
+<div class="warn-strip">
+  <div class="inner">
+    <strong>Сначала защита:</strong> если планируете разблокировку — немедленно удалите системный апдейтер <code>pm uninstall --user 0 com.android.updater</code> и не обновляйтесь. Xiaomi рассылает принудительные «тихие» обновления, которые отключают efisp и могут прошить аппаратные фьюзы — загрузчик заблокируется навсегда.
+  </div>
+</div>
+
+<nav class="tabbar">
+  <div class="tabs" id="tabs"></div>
+</nav>
+
+<main class="content" id="content"></main>
+
+<footer class="footer">
+  <div class="fine">
+    Неофициальный инструмент сообщества. Ссылки ведут на GitHub Releases и официальные страницы проектов. Модификации — на ваш страх и риск; делайте бэкап. Данные прогресса хранятся только в этом устройстве.
+  </div>
+  <button class="reset-btn" id="resetBtn" type="button">Сбросить прогресс</button>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
