@@ -48,6 +48,14 @@
       intro: '<strong>Авто-режим:</strong> каталог ниже скачивает APK напрямую из приложения — версии и ссылки подтягиваются автоматически с GitHub и F-Droid, устанавливать сами магазины не нужно. Ниже — классические магазины (Aurora, Obtainium, RuStore и др.) для тех, кто хочет полноценную витрину: все они <strong>мультиязычны</strong> и работают на HyperOS как на CN-прошивке, так и на xiaomi.eu.'
     },
     {
+      id: 'debloat',
+      tab: 'Деблоат',
+      anchor: 'tab-debloat',
+      verdict: 'safe',
+      verdictText: 'Сканер · безопасное удаление · очистка остатков',
+      intro: '<strong>Интерактивный сканер</strong> китайских приложений CN-прошивки: вставьте вывод <code>pm list packages</code> — приложение сверит его с базой из ~70 пакетов, покажет, что установлено именно на вашем смартфоне, рассортирует по риску удаления и выдаст готовые команды, включая <strong>очистку остатков</strong>. Ничего не удаляется автоматически — вы выполняете команды сами через Termux/Shizuku или ADB с ПК.'
+    },
+    {
       id: 'ref',
       tab: 'Справка',
       anchor: 'tab-ref',
@@ -58,6 +66,53 @@
   ];
 
   const ITEMS = [
+    /* ---------- ДЕБЛОАТ ---------- */
+    {
+      id: 'db-setup', sec: 'debloat', level: 'safe', levelText: 'шаг 1',
+      name: 'Где выполнять команды', src: 'Termux + Shizuku / ADB',
+      tagline: 'Два способа: прямо на телефоне или с ПК',
+      desc: 'Команды сканера выполняются там, где есть shell-доступ. <strong>Вариант на телефоне:</strong> установите Termux из авто-каталога (магазины) и приложение <code>rish</code>/Shizuku — команды <code>pm</code> будут работать локально через Shizuku. <strong>Вариант с ПК:</strong> обычный <code>adb shell</code> по кабелю или Wi-Fi. Оба варианта не требуют root и не снимают гарантию.',
+      steps: [
+        'На телефоне: Termux + Shizuku запущен → <code>rish</code> даёт shell-права внутри Termux.',
+        'С ПК: <code>adb shell</code> → выполняйте команды сканера как есть.',
+        'Все операции — только для user 0: данные не стираются у других пользователей/клонов.',
+        'Перед массовым удалением сделайте скриншот списка — это ваша «карта отката».'
+      ],
+      links: [
+        { label: 'Termux · прямая APK (авто-каталог)', url: '#tab-stores' },
+        { label: 'Shizuku · GitHub', url: 'https://github.com/RikkaApps/Shizuku/releases', primary: true }
+      ]
+    },
+    {
+      id: 'db-rules', sec: 'debloat', level: 'warn', levelText: 'правила',
+      name: 'Правила безопасного деблоата', src: 'чеклист',
+      tagline: 'Что можно, что нельзя, и как не получить бутлуп',
+      desc: 'Сканер намеренно консервативен: красные пакеты (Security, SystemUI, PowerKeeper, Mi Account, PackageInstaller, Launcher, камера) <strong>не отмечаются</strong> — их удаление ломает систему или превращает аппарат в кирпич до перепрошивки. Жёлтые — функциональные (погода, галерея, заметки, клавиатуры): удаляйте, только если поставили замену. Зелёные — чистый CN-мусор и реклама.',
+      steps: [
+        'Никогда не удаляйте: com.miui.securitycenter, com.miui.systemui, com.miui.powerkeeper, com.xiaomi.account, com.miui.packageinstaller, com.miui.home (без замены лаунчера).',
+        'Сначала замена — потом удаление: Gboard до удаления CN-клавиатур, Fossify Gallery до Галереи Mi, Chrome до Mi Browser.',
+        'Удаляйте порциями по 5–8 пакетов и проверяйте, что система работает: звонки, уведомления, перезагрузка.',
+        'XiaoAI-пакеты (voiceassist и ко) — только после того, как Gemini назначен ассистентом по умолчанию.'
+      ],
+      note: { type: 'warn', html: '<strong>OTA-предупреждение:</strong> системные обновления могут вернуть удалённые CN-приложения. Если планируете оставаться на стоке и обновляться — деблоат придётся повторять; на xiaomi.eu этой проблемы нет.' },
+      links: [
+        { label: 'Universal Debloat List (справочник)', url: 'https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation' }
+      ]
+    },
+    {
+      id: 'db-cleanup', sec: 'debloat', level: 'safe', levelText: 'шаг 3',
+      name: 'Очистка остатков после удаления', src: 'сканер → кнопка «+ очистка»',
+      tagline: 'Кэш, данные user 0 и мусор на общем хранилище',
+      desc: '<code>pm uninstall --user 0</code> убирает приложение, но оставляет следы: кэш в <code>/data/data</code>, папки в <code>/sdcard/Android/data</code>, логи MIUI. Кнопка сканера «+ очистка остатков» генерирует расширенный набор команд: <code>pm clear</code> для каждого удалённого пакета, удаление типовых CN-директорий (miui, MIUI/debug_log) и поиск остаточных папок по имени пакета.',
+      steps: [
+        'Сгенерируйте команды «+ очистка» сразу после удаления — пока список свежий.',
+        '<code>pm clear --user 0</code> безопасен: чистит только данные удалённого приложения.',
+        'Папки на /sdcard удаляются через Termux или любой файловый менеджер (Material Files из авто-каталога).',
+        'Финал: перезагрузка — ядро сбрасывает кэши dex, интерфейс пересобирается чистым.'
+      ],
+      links: []
+    },
+
     /* ---------- A · СТОК ---------- */
     {
       id: 'updater-off', sec: 'stock', level: 'warn', levelText: 'первым шагом',
@@ -720,6 +775,233 @@
   }
 
   /* ================================================================
+     ДЕБЛОАТ: база CN-пакетов + сканер + очистка остатков
+     risk: green (безопасно) · yellow (подумать) · red (не трогать)
+     ================================================================ */
+  const DEBLOAT_DB = [
+    /* — Магазины и витрины — */
+    { pkg: 'com.xiaomi.mipicks', name: 'GetApps (китайский магазин)', cat: 'stores', risk: 'green', note: 'Реклама и CN-витрина. Замена: Aurora Store / F-Droid.' },
+    { pkg: 'com.mi.global.shop', name: 'Mi Store', cat: 'stores', risk: 'green', note: 'Магазин устройств Xiaomi, не нужен за пределами КНР.' },
+    { pkg: 'com.mi.global.bbs', name: 'Mi Community', cat: 'stores', risk: 'green', note: 'Форум-приложение, только китайский.' },
+    { pkg: 'com.xiaomi.joyose', name: 'Joyose (аналитика/трекинг)', cat: 'sys-extra', risk: 'green', note: 'Фоновый сбор телеметрии и «игровые» сервисы CN.' },
+    /* — Медиа CN — */
+    { pkg: 'com.miui.video', name: 'Mi Video (小米视频)', cat: 'media', risk: 'green', note: 'CN-видеосервис с рекламой.' },
+    { pkg: 'com.miui.player', name: 'Mi Music (小米音乐)', cat: 'media', risk: 'green', note: 'CN-музыкальный сервис.' },
+    { pkg: 'com.mi.globalbrowser', name: 'Mi Browser', cat: 'media', risk: 'yellow', note: 'Если пользуетесь Chrome — удаляйте. Некоторые CN-ссылки открываются в нём по умолчанию.' },
+    { pkg: 'com.duokan.reader', name: 'Duokan Reader (多看阅读)', cat: 'media', risk: 'green', note: 'CN-читалка книг.' },
+    /* — Игры и развлечения — */
+    { pkg: 'com.xiaomi.glgm', name: 'Игры Xiaomi (游戏中心)', cat: 'media', risk: 'green', note: 'CN-игровой центр.' },
+    { pkg: 'com.miui.videoplayer', name: 'Видеоплеер (компонент)', cat: 'media', risk: 'red', note: 'Системный кодек-плеер, используется другими приложениями.' },
+    /* — Аналитика и реклама — */
+    { pkg: 'com.miui.analytics', name: 'Analytics (аналитика MIUI)', cat: 'sys-extra', risk: 'green', note: 'Сбор статистики использования.' },
+    { pkg: 'com.miui.msa.global', name: 'MSA (рекламный сервис)', cat: 'sys-extra', risk: 'yellow', note: 'Рекламный идентификатор. После удаления проверьте, что приложения не падают; вернуть: pm install-existing.' },
+    { pkg: 'com.miui.daemon', name: 'MiuiDaemon (фоновые CN-сервисы)', cat: 'sys-extra', risk: 'yellow', note: 'Фоновые задачи CN-экосистемы.' },
+    { pkg: 'com.miui.systemAdSolution', name: 'Рекламные решения (AdSolution)', cat: 'sys-extra', risk: 'green', note: 'Встроенная реклама в системных приложениях.' },
+    { pkg: 'com.miui.hybrid', name: 'Quick Apps (快应用)', cat: 'sys-extra', risk: 'green', note: 'CN-платформа «быстрых приложений» — источник рекламных пушей.' },
+    { pkg: 'com.miui.hybrid.accessory', name: 'Quick Apps Accessory', cat: 'sys-extra', risk: 'green', note: 'Компаньон Quick Apps.' },
+    /* — AI и голос (CN) — */
+    { pkg: 'com.miui.voiceassist', name: 'XiaoAI (голосовой ассистент)', cat: 'ai', risk: 'yellow', note: 'Только китайский. Удаляйте после настройки Gemini как ассистента по умолчанию.' },
+    { pkg: 'com.miui.voicetrigger', name: 'Voice Trigger (активация голосом)', cat: 'ai', risk: 'yellow', note: '«Привет, XiaoAI». Не нужен без XiaoAI.' },
+    { pkg: 'com.xiaomi.aiasst.service', name: 'AI-сервисы Xiaomi', cat: 'ai', risk: 'yellow', note: 'Фоновые AI-сервисы CN (переводчик, субтитры).' },
+    { pkg: 'com.xiaomi.aicr', name: 'AI Call / AI Call Recorder', cat: 'ai', risk: 'green', note: 'CN-функции звонков с AI.' },
+    { pkg: 'com.miui.audiomonitor', name: 'Audio Monitor', cat: 'ai', risk: 'green', note: 'Прослушивание окружения для XiaoAI.' },
+    /* — CN-утилиты — */
+    { pkg: 'com.miui.weather2', name: 'Погода (CN-сервисы)', cat: 'cn-utils', risk: 'yellow', note: 'Виджет погоды на рабочем столе зависит от него. Замена: Google Weather.' },
+    { pkg: 'com.miui.calculator', name: 'Калькулятор Mi', cat: 'cn-utils', risk: 'yellow', note: 'Удобный, но есть альтернативы в Play Store.' },
+    { pkg: 'com.miui.notes', name: 'Заметки Mi', cat: 'cn-utils', risk: 'yellow', note: 'Если не пользуетесь — удаляйте. Замена: Google Keep.' },
+    { pkg: 'com.miui.compass', name: 'Компас', cat: 'cn-utils', risk: 'green', note: '' },
+    { pkg: 'com.miui.screenrecorder', name: 'Запись экрана (Mi)', cat: 'cn-utils', risk: 'yellow', note: 'Штатный рекордер экрана HyperOS.' },
+    { pkg: 'com.miui.soundrecorder', name: 'Диктофон (Mi)', cat: 'cn-utils', risk: 'yellow', note: '' },
+    { pkg: 'com.miui.scanner', name: 'Сканер (扫一扫)', cat: 'cn-utils', risk: 'green', note: 'CN-сканер QR/документов. Замена: Google Lens.' },
+    { pkg: 'com.mi.health', name: 'Mi Health / Здоровье', cat: 'cn-utils', risk: 'yellow', note: 'Если носите Mi Band через Zepp Life — оставьте.' },
+    { pkg: 'com.xiaomi.wearable', name: 'Xiaomi Wear / Носимые', cat: 'cn-utils', risk: 'yellow', note: 'Нужен только с CN-версиями носимых устройств.' },
+    { pkg: 'com.miui.fm', name: 'FM-радио', cat: 'cn-utils', risk: 'green', note: '' },
+    { pkg: 'com.miui.miservice', name: 'Mi Services (CN-услуги)', cat: 'cn-utils', risk: 'yellow', note: 'Фоновые CN-сервисы (доставка, такси в Пиксель-записных).' },
+    { pkg: 'com.miui.misound', name: 'Mi Sound / Dirac', cat: 'cn-utils', risk: 'red', note: 'Аудиодвижок — после удаления возможны проблемы со звуком.' },
+    /* — Сервисы Xiaomi — */
+    { pkg: 'com.xiaomi.account', name: 'Mi Account', cat: 'xiaomi-svc', risk: 'red', note: 'Удаление ломает облако, темы и «Найти устройство». Оставьте.' },
+    { pkg: 'com.xiaomi.xmsf', name: 'Xiaomi Service Framework', cat: 'xiaomi-svc', risk: 'red', note: 'Ядро CN-пушей и Mi-аккаунта.' },
+    { pkg: 'com.xiaomi.xmsfkeeper', name: 'XMSF Keeper', cat: 'xiaomi-svc', risk: 'red', note: 'Держатель сервис-фреймворка.' },
+    { pkg: 'com.xiaomi.market', name: 'Mi Market (витрина)', cat: 'xiaomi-svc', risk: 'green', note: 'CN-витрина внутри GetApps.' },
+    { pkg: 'com.xiaomi.payment', name: 'Mi Pay / Оплата', cat: 'xiaomi-svc', risk: 'yellow', note: 'CN-платежи; без китайской карты бесполезен.' },
+    { pkg: 'com.miui.micloudsync', name: 'Mi Cloud Sync', cat: 'xiaomi-svc', risk: 'yellow', note: 'Синхронизация CN-облака. Если не пользуетесь — удаляйте.' },
+    { pkg: 'com.miui.cloudservice', name: 'Mi Cloud Service', cat: 'xiaomi-svc', risk: 'yellow', note: 'То же: нужен только для CN-облака.' },
+    { pkg: 'com.xiaomi.simactivate.service', name: 'SIM Activate (CN)', cat: 'xiaomi-svc', risk: 'red', note: 'Активация SIM на CN ROM.' },
+    /* — Темы, персонализация — */
+    { pkg: 'com.android.thememanager', name: 'Темы (Theme Manager)', cat: 'cn-utils', risk: 'yellow', note: 'CN-магазин тем; при удалении темы перестанут скачиваться.' },
+    { pkg: 'com.miui.personalassistant', name: 'App Vault / Лента (智能助理)', cat: 'cn-utils', risk: 'green', note: 'Лента слева от рабочего стола с CN-контентом.' },
+    { pkg: 'com.miui.contentextension', name: 'Content Extension', cat: 'cn-utils', risk: 'green', note: 'Рекламные подсказки при выделении текста.' },
+    { pkg: 'com.miui.extraphoto', name: 'Extra Photo (CN-фильтры)', cat: 'cn-utils', risk: 'green', note: 'Доп. фильтры CN-камеры.' },
+    /* — Системные: НЕ ТРОГАТЬ — */
+    { pkg: 'com.miui.securitycenter', name: 'Безопасность (Security)', cat: 'system', risk: 'red', note: 'Удаление ломает разрешения приложений и «оптимизацию».' },
+    { pkg: 'com.miui.securitycore', name: 'Security Core', cat: 'system', risk: 'red', note: '' },
+    { pkg: 'com.miui.powerkeeper', name: 'PowerKeeper (батарея)', cat: 'system', risk: 'red', note: 'Управление энергосбережением; удаление вызывает зависания.' },
+    { pkg: 'com.miui.systemui', name: 'SystemUI', cat: 'system', risk: 'red', note: 'Статус-бар и шторка. Никогда.' },
+    { pkg: 'com.android.settings', name: 'Настройки', cat: 'system', risk: 'red', note: '' },
+    { pkg: 'com.android.phone', name: 'Телефон (компонент)', cat: 'system', risk: 'red', note: '' },
+    { pkg: 'com.miui.home', name: 'Launcher (рабочий стол)', cat: 'system', risk: 'red', note: 'Удаление без установленного Nova/Lawnchair = кирпич интерфейса.' },
+    { pkg: 'com.miui.gallery', name: 'Галерея Mi', cat: 'cn-utils', risk: 'yellow', note: 'Замена: Fossify Gallery из авто-каталога. Некоторые функции камеры (просмотр) зависят от неё.' },
+    { pkg: 'com.android.camera', name: 'Камера (Mi/Leica)', cat: 'system', risk: 'red', note: 'Удаление лишает Leica-режимов и второго экрана.' },
+    { pkg: 'com.miui.packageinstaller', name: 'Установщик пакетов', cat: 'system', risk: 'red', note: 'Без него APK не ставятся!' },
+    { pkg: 'com.miui.bugreport', name: 'Bug Report (отчёты)', cat: 'sys-extra', risk: 'green', note: 'Отправка отчётов Xiaomi.' },
+    { pkg: 'com.miui.yellowpage', name: 'Yellow Page (жёлтые страницы CN)', cat: 'sys-extra', risk: 'green', note: 'CN-справочник в «Телефоне».' },
+    { pkg: 'com.android.midrive', name: 'Mi Drive', cat: 'xiaomi-svc', risk: 'yellow', note: 'CN-облачный диск.' },
+    { pkg: 'com.miui.touchassistant', name: 'Touch Assistant (плавающий шар)', cat: 'cn-utils', risk: 'green', note: '' },
+    { pkg: 'com.miui.voiceassistoverlay', name: 'XiaoAI Overlay', cat: 'ai', risk: 'green', note: 'Оверлей ассистента.' },
+    { pkg: 'com.miui.accessibility', name: 'Mi Accessibility', cat: 'system', risk: 'red', note: 'Специальные возможности.' },
+    { pkg: 'com.xiaomi.discover', name: 'Xiaomi Discover (реклама)', cat: 'sys-extra', risk: 'green', note: 'Рекламные рекомендации приложений.' },
+    { pkg: 'com.miui.cleaner', name: 'Cleaner (очистка мусора)', cat: 'sys-extra', risk: 'yellow', note: 'Агрессивный «очиститель» с рекламой. Замена не нужна.' },
+    { pkg: 'com.miui.guardprovider', name: 'Guard Provider (антивирус CN)', cat: 'sys-extra', risk: 'green', note: 'CN-антивирусный движок (Tencent/Avast CN).' },
+    { pkg: 'com.miui.translation.kingsoft', name: 'Перевод Kingsoft', cat: 'ai', risk: 'green', note: 'CN-движок перевода.' },
+    { pkg: 'com.miui.translation.youdao', name: 'Перевод Youdao', cat: 'ai', risk: 'green', note: 'CN-движок перевода.' },
+    { pkg: 'com.miui.translation.xmcloud', name: 'XM Cloud Translate', cat: 'ai', risk: 'green', note: '' },
+    { pkg: 'com.miui.face', name: 'Face Unlock (Mi)', cat: 'system', risk: 'red', note: 'Разблокировка по лицу перестанет работать.' },
+    { pkg: 'com.xiaomi.barrage', name: 'Barrage (данму-комментарии)', cat: 'media', risk: 'green', note: 'CN-комментарии поверх видео.' },
+    { pkg: 'com.miui.smarttravel', name: 'Smart Travel (поездки CN)', cat: 'cn-utils', risk: 'green', note: 'CN-функции поездок.' },
+    { pkg: 'com.miui.mishare.connectivity', name: 'Mi Share (обмен)', cat: 'cn-utils', risk: 'yellow', note: 'Обмен с устройствами Xiaomi. Замена: LocalSend.' },
+    { pkg: 'com.miui.miinput', name: 'Клавиатура Mi (CN)', cat: 'cn-utils', risk: 'yellow', note: 'Сначала установите Gboard! Иначе останетесь без клавиатуры.' },
+    { pkg: 'com.iflytek.inputmethod.miui', name: 'iFlytek IME (CN-ввод)', cat: 'cn-utils', risk: 'green', note: 'Китайская клавиатура. Замена: Gboard.' },
+    { pkg: 'com.sohu.inputmethod.sogou.xiaomi', name: 'Sogou IME (CN-ввод)', cat: 'cn-utils', risk: 'green', note: 'Китайская клавиатура Sogou.' },
+    { pkg: 'com.baidu.input_mi', name: 'Baidu IME (CN-ввод)', cat: 'cn-utils', risk: 'green', note: 'Китайская клавиатура Baidu.' },
+    { pkg: 'com.miui.carlink', name: 'CarWith (CN-авто)', cat: 'cn-utils', risk: 'green', note: 'CN-аналог Android Auto; не работает с зарубежными авто.' },
+    { pkg: 'com.milink.service', name: 'MiLink (часть Mi Share)', cat: 'cn-utils', risk: 'yellow', note: 'Связь с экосистемой Xiaomi.' }
+  ];
+
+  const DEBLOAT_CATS = {
+    'stores': 'Магазины и витрины', 'media': 'Медиа CN', 'sys-extra': 'Аналитика и реклама',
+    'ai': 'AI и голос (CN)', 'cn-utils': 'CN-утилиты', 'xiaomi-svc': 'Сервисы Xiaomi',
+    'system': 'Системные — не трогать'
+  };
+  const RISK_META = {
+    green: { label: 'Безопасно', cls: 'r-green' },
+    yellow: { label: 'Подумать', cls: 'r-yellow' },
+    red: { label: 'Не трогать', cls: 'r-red' }
+  };
+
+  function debloatRenderResults(found) {
+    const wrap = $('#dbResults');
+    if (!wrap) return;
+    if (!found.length) {
+      wrap.innerHTML = '<div class="db-empty">Совпадений не найдено. Проверьте, что вставлен вывод <code>pm list packages</code> (или имена пакетов через запятую/пробел).</div>';
+      return;
+    }
+    const groups = { green: [], yellow: [], red: [] };
+    found.forEach((d) => groups[d.risk].push(d));
+    const summary = '<div class="db-summary">' +
+      '<span class="db-chip r-green">● безопасно: ' + groups.green.length + '</span>' +
+      '<span class="db-chip r-yellow">● подумать: ' + groups.yellow.length + '</span>' +
+      '<span class="db-chip r-red">● не трогать: ' + groups.red.length + '</span>' +
+      '</div>';
+
+    const section = (riskKey, title, hint) => {
+      const arr = groups[riskKey];
+      if (!arr.length) return '';
+      return '<div class="db-group">' +
+        '<div class="db-group-title">' + title + ' <span>' + hint + '</span></div>' +
+        arr.map((d) => {
+          const rm = RISK_META[d.risk];
+          return '<label class="db-item">' +
+            (d.risk !== 'red'
+              ? '<input type="checkbox" class="db-check" data-pkg="' + d.pkg + '"' + (d.risk === 'green' ? ' checked' : '') + '>'
+              : '<span class="db-nocheck" title="Системный пакет">⌀</span>') +
+            '<span class="db-item-main">' +
+              '<span class="db-item-name">' + esc(d.name) + ' <span class="db-risk ' + rm.cls + '">' + rm.label + '</span></span>' +
+              '<span class="db-item-pkg">' + esc(d.pkg) + '</span>' +
+              (d.note ? '<span class="db-item-note">' + esc(d.note) + '</span>' : '') +
+            '</span>' +
+          '</label>';
+        }).join('') + '</div>';
+    };
+
+    wrap.innerHTML = summary +
+      '<div class="db-toolbar">' +
+        '<button class="db-btn" id="dbGenCmd" type="button">Сгенерировать команды удаления</button>' +
+        '<button class="db-btn ghost" id="dbGenCleanup" type="button">+ очистка остатков</button>' +
+        '<button class="db-btn ghost" id="dbGenRestore" type="button">Команды восстановления</button>' +
+      '</div>' +
+      '<div id="dbCmdOut"></div>' +
+      section('green', 'Можно удалять', '— отмечены автоматически') +
+      section('yellow', 'Удалять с осторожностью', '— отметьте осознанно') +
+      section('red', 'Не удалять', '— системные, риск кирпича');
+  }
+
+  function debloatSelected() {
+    return Array.from(document.querySelectorAll('.db-check:checked')).map((c) => c.dataset.pkg);
+  }
+
+  function debloatCmdBlock(title, lines) {
+    const text = lines.join('\n');
+    return '<div class="db-cmd-title">' + esc(title) + '</div>' +
+      '<div class="cmd"><code>' + esc(text) + '</code><button class="copy-btn" data-copy="' + esc(text) + '" type="button">копия</button></div>';
+  }
+
+  function debloatGenerate(withCleanup) {
+    const pkgs = debloatSelected();
+    const out = $('#dbCmdOut');
+    if (!pkgs.length) { toast('Отметьте хотя бы один пакет'); return; }
+    const lines = ['# Удаление для текущего пользователя (обратимо):'];
+    pkgs.forEach((p) => lines.push('pm uninstall --user 0 ' + p));
+    if (withCleanup) {
+      lines.push('');
+      lines.push('# Очистка остатков: кэш и данные для user 0');
+      pkgs.forEach((p) => lines.push('pm clear --user 0 ' + p));
+      lines.push('');
+      lines.push('# Остатки на SD/общем хранилище (через Termux/файловый менеджер):');
+      lines.push('rm -rf /sdcard/Android/data/*xiao* /sdcard/Android/data/*miui* 2>/dev/null');
+      lines.push('rm -rf /sdcard/MIUI/debug_log /sdcard/miui 2>/dev/null');
+      lines.push('');
+      lines.push('# Точечная проверка остатков по удалённым пакетам:');
+      pkgs.forEach((p) => lines.push('ls /sdcard/Android/data/ | grep -i "' + p.split('.').pop() + '"'));
+    }
+    const title = 'Команды для Termux (Shizuku) или adb shell — ' + pkgs.length + ' пакетов' + (withCleanup ? ' + очистка' : '');
+    out.innerHTML = debloatCmdBlock(title, lines);
+    out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function debloatRestore() {
+    const pkgs = debloatSelected();
+    const out = $('#dbCmdOut');
+    if (!pkgs.length) { toast('Отметьте хотя бы один пакет'); return; }
+    const lines = ['# Восстановление удалённого (user 0):'];
+    pkgs.forEach((p) => lines.push('pm install-existing ' + p));
+    out.innerHTML = debloatCmdBlock('Откат — вернуть ' + pkgs.length + ' пакетов как было', lines);
+    out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function debloatScan() {
+    const raw = ($('#dbInput').value || '').toLowerCase();
+    const present = new Set();
+    raw.split(/[\s,;]+/).forEach((tok) => {
+      tok = tok.replace(/^package:/, '').trim();
+      if (tok.indexOf('.') !== -1) present.add(tok);
+    });
+    const found = DEBLOAT_DB.filter((d) => present.has(d.pkg));
+    debloatRenderResults(found);
+    if (found.length) toast('Найдено пакетов: ' + found.length);
+  }
+
+  function initDebloat() {
+    const pane = document.querySelector('.pane[data-sec="debloat"]');
+    if (!pane || pane.dataset.dbInit) return;
+    pane.dataset.dbInit = '1';
+    pane.addEventListener('click', (e) => {
+      if (e.target.closest('#dbScan')) debloatScan();
+      else if (e.target.closest('#dbSample')) {
+        $('#dbInput').value = [
+          'package:com.xiaomi.mipicks', 'package:com.miui.video', 'package:com.miui.player',
+          'package:com.miui.analytics', 'package:com.miui.hybrid', 'package:com.miui.voiceassist',
+          'package:com.miui.weather2', 'package:com.xiaomi.account', 'package:com.miui.securitycenter',
+          'package:com.miui.notes', 'package:com.iflytek.inputmethod.miui', 'package:com.miui.cleaner'
+        ].join('\n');
+        debloatScan();
+      }
+      else if (e.target.closest('#dbGenCmd')) debloatGenerate(false);
+      else if (e.target.closest('#dbGenCleanup')) debloatGenerate(true);
+      else if (e.target.closest('#dbGenRestore')) debloatRestore();
+    });
+  }
+
+  /* ================================================================
      СОСТОЯНИЕ
      ================================================================ */
   const LS_KEY = 'ga-pwa-state-v1';
@@ -801,14 +1083,30 @@
           '</div>' +
           '<div class="classic-title">Классические магазины — по желанию</div>'
         : '';
+      const debloatBlock = sec.id === 'debloat'
+        ? '<div class="auto-store db-store">' +
+            '<div class="auto-head">' +
+              '<div class="auto-title">Сканер китайских приложений</div>' +
+              '<button class="auto-refresh" id="dbSample" type="button">Демо-данные</button>' +
+            '</div>' +
+            '<div class="auto-sub"><strong>Шаг 1.</strong> Получите список пакетов со смартфона одной из команд ниже (Termux с Shizuku — прямо на телефоне, либо adb shell с ПК). <strong>Шаг 2.</strong> Вставьте вывод в поле и нажмите «Сканировать».</div>' +
+            '<div class="cmd"><code>pm list packages | grep -iE "xiaomi|miui|mi\\.|duokan|iflytek|sogou|baidu"</code><button class="copy-btn" data-copy="pm list packages | grep -iE &quot;xiaomi|miui|mi\\.|duokan|iflytek|sogou|baidu&quot;" type="button">копия</button></div>' +
+            '<textarea class="db-input" id="dbInput" rows="6" placeholder="package:com.xiaomi.mipicks&#10;package:com.miui.video&#10;…" spellcheck="false"></textarea>' +
+            '<button class="db-scan" id="dbScan" type="button">Сканировать установленное</button>' +
+            '<div id="dbResults"></div>' +
+            '<div class="auto-note">Удаление идёт через <code>pm uninstall --user 0</code> — APK остаётся в системном разделе, поэтому всё обратимо командой <code>pm install-existing</code> без прошивки. Системные пакеты (красные) сканер помечает, но не даёт отметить.</div>' +
+          '</div>'
+        : '';
       pane.innerHTML =
         '<div class="pane-intro"><span class="verdict ' + sec.verdict + '">' + esc(sec.verdictText) + '</span><br>' + sec.intro + '</div>' +
         autoBlock +
+        debloatBlock +
         items.map(itemHTML).join('');
       contentEl.appendChild(pane);
     });
     updateOverall();
     initAutoStore();
+    initDebloat();
   }
 
   function switchTab(secId) {

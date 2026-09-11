@@ -1,5 +1,5 @@
 /* Global Assistant PWA — service worker (offline-first) */
-const VERSION = 'ga-pwa-v1.2.0';
+const VERSION = 'ga-pwa-v1.3.0';
 const CORE = [
   './',
   './index.html',

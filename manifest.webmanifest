@@ -19,6 +19,11 @@
   ],
   "shortcuts": [
     {
+      "name": "Деблоат: сканер CN-приложений",
+      "url": "./index.html#tab-debloat",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
       "name": "Магазины приложений",
       "url": "./index.html#tab-stores",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
